@@ -1,17 +1,26 @@
 <template>
   <div class="root">
     <div class="config"></div>
-    <div class="top"></div>
+    <div class="top">
+    </div>
     <div class="content">
-      <div class="left"></div>
-      <div class="right"></div>
+      <div class="left">
+        <el-input v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input" />
+      </div>
+      <div class="right">
+        <span>
+          {{ textarea }}
+
+        </span>
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ref } from "vue"
-
+import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+const textarea = ref(``)
 </script>
 
 <style scoped>
@@ -23,36 +32,38 @@ import { ref } from "vue"
   width: 100vw;
   height: 100vh;
   padding: 20px;
+  background-color: white;
 
   .config {
-    width: 1000px;
+    width: 1200px;
     height: 50px;
     background-color: pink;
   }
 
   .top {
-    width: 1000px;
+    width: 1200px;
     height: 50px;
-    background-color: red;
+    background-color: yellow;
   }
 
   .content {
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 1000px;
+    width: 1200px;
     height: 700px;
 
     .left {
       width: 50%;
       height: 100%;
-      background-color: green;
     }
 
     .right {
-      width: 50%;
-      height: 100%;
-      background-color: yellow;
+      white-space: pre-line;
+      width: 600px;
+      height: 560px;
+      overflow: scroll;
+      background-color: black;
     }
   }
 }
