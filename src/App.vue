@@ -8,19 +8,24 @@
         <el-input v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input" />
       </div>
       <div class="right">
-        <span>
-          {{ textarea }}
-
-        </span>
+        <div v-html="htmlContent"></div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref } from "vue"
+import { ref, watch } from "vue"
+import { markdownTokenizer, renderHTML } from './api/index.ts'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 const textarea = ref(``)
+const htmlContent = ref(``);
+
+watch(textarea, (newValue) => {
+  const tokenList = markdownTokenizer(newValue)
+  htmlContent.value = renderHTML(tokenList)
+})
+
 </script>
 
 <style scoped>
