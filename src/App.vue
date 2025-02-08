@@ -19,6 +19,7 @@ import { ref, watch } from "vue"
 import { markdownTokenizer, renderHTML } from './api/index.ts'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 const textarea = ref(``)
+
 const htmlContent = ref(``);
 
 watch(textarea, (newValue) => {
