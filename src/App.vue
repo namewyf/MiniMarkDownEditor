@@ -2,6 +2,12 @@
   <div class="root">
     <div class="config"></div>
     <div class="top">
+      <button
+      class="iconfont"
+      v-html="'&#x'+item.unicode+';'"
+      v-for="item in iconList"
+      :key="item.icon_id"
+      ></button>
     </div>
     <div class="content">
       <div class="left">
@@ -12,13 +18,13 @@
       </div>
     </div>
   </div>
-  <div></div>
 </template>
 
 <script lang="ts" setup>
 import { ref, watch } from "vue"
 import { markdownTokenizer, renderHTML } from './api/index.ts'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import IconListInfo from '@/assets/iconfont/iconfont.json'
 const textarea = ref(``)
 const htmlContent = ref(``);
 
@@ -26,10 +32,12 @@ watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
 })
-
+//快捷键栏
+const iconList = IconListInfo.glyphs
 </script>
 
 <style scoped>
+@import '@/assets/iconfont/iconfont.css';
 .root {
   display: flex;
   flex-direction: column;
@@ -50,6 +58,10 @@ watch(textarea, (newValue) => {
     width: 1200px;
     height: 50px;
     background-color: yellow;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    flex-wrap: nowrap;
   }
 
   .content {
