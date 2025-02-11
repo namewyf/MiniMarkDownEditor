@@ -1,11 +1,17 @@
 <template>
   <div class="root">
     <div class="config"></div>
-    <div class="top">
-    </div>
+    <div class="top"></div>
     <div class="content">
       <div class="left">
-        <el-input v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input" />
+        <el-input
+          v-model="textarea"
+          style="width: 100%"
+          :rows="26"
+          type="textarea"
+          placeholder="Please input"
+        >
+        </el-input>
       </div>
       <div class="right">
         <div v-html="htmlContent"></div>
@@ -15,20 +21,19 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from "vue"
-import { markdownTokenizer, renderHTML } from './api/index.ts'
+import { ref, watch } from 'vue'
+import { markdownTokenizer, renderHTML } from './api/index'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 const textarea = ref(``)
-const htmlContent = ref(``);
+const htmlContent = ref(``)
 
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
 })
-
 </script>
 
-<style scoped>
+<style>
 .root {
   display: flex;
   flex-direction: column;
@@ -70,6 +75,12 @@ watch(textarea, (newValue) => {
       overflow: scroll;
       background-color: black;
     }
+  }
+  blockquote {
+    border-left: 8px solid #ccc;
+    padding-left: 10px;
+    margin: 5px 0;
+    border-radius: 0px;
   }
 }
 </style>
