@@ -75,6 +75,12 @@ watch(textarea, (newValue) => {
       overflow: scroll;
       background-color: black;
     }
+    blockquote {
+    border-left: 8px solid #ccc;
+    padding-left: 8px;
+    margin: 5px 0;
+    border-radius: 0px;
+  }
   }
 }
 </style>
