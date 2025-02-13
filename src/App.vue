@@ -1,16 +1,13 @@
 <template>
   <div class="root">
     <div class="config"></div>
-    <div class="top"></div>
+    <div class="top">
+      <button class="iconfont" v-html="'&#x' + item.unicode + ';'" v-for="item in iconList"
+        :key="item.icon_id"></button>
+    </div>
     <div class="content">
       <div class="left">
-        <el-input
-          v-model="textarea"
-          style="width: 100%"
-          :rows="26"
-          type="textarea"
-          placeholder="Please input"
-        >
+        <el-input v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input">
         </el-input>
       </div>
       <div class="right">
@@ -24,6 +21,7 @@
 import { ref, watch } from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import IconListInfo from '@/assets/iconfont/iconfont.json'
 const textarea = ref(``)
 const htmlContent = ref(``)
 
@@ -31,9 +29,13 @@ watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
 })
+//快捷键栏
+const iconList = IconListInfo.glyphs
 </script>
 
 <style>
+@import '@/assets/iconfont/iconfont.css';
+
 .root {
   display: flex;
   flex-direction: column;
@@ -54,6 +56,10 @@ watch(textarea, (newValue) => {
     width: 1200px;
     height: 50px;
     background-color: yellow;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    flex-wrap: nowrap;
   }
 
   .content {
@@ -75,12 +81,13 @@ watch(textarea, (newValue) => {
       overflow: scroll;
       background-color: black;
     }
+
     blockquote {
-    border-left: 8px solid #ccc;
-    padding-left: 8px;
-    margin: 5px 0;
-    border-radius: 0px;
-  }
+      border-left: 8px solid #ccc;
+      padding-left: 8px;
+      margin: 5px 0;
+      border-radius: 0px;
+    }
   }
 }
 </style>
