@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "iconfont_func"; /* Project id 4830321 */
+  src: url('iconfont_func.woff2?t=1739798050427') format('woff2'),
+       url('iconfont_func.woff?t=1739798050427') format('woff'),
+       url('iconfont_func.ttf?t=1739798050427') format('truetype');
+}
+
+.iconfont_func {
+  font-family: "iconfont_func" !important;
+  font-size: 25px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  width: 50px;
+  height: 100%;
+  background-color: transparent;
+  border:none;
+  border-radius: 10px;
+}

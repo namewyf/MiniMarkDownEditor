@@ -7,77 +7,103 @@
   "glyphs": [
     {
       "icon_id": "77403",
-      "name": "链接",
+      "name": "Link",
       "font_class": "lianjie",
       "unicode": "e600",
-      "unicode_decimal": 58880
+      "unicode_decimal": 58880,
+      "markdown":"[](url)",
+      "type":"none"
     },
     {
       "icon_id": "4779612",
-      "name": "表单组件-表格",
+      "name": "Table",
       "font_class": "biaodanzujian-biaoge",
       "unicode": "ec15",
-      "unicode_decimal": 60437
+      "unicode_decimal": 60437,
+      "markdown":"| Heading |  |\n| --- | --- |\n|  |  |",
+      "type":"none"
     },
     {
       "icon_id": "4890461",
-      "name": "引用",
+      "name": "Quote",
       "font_class": "yinyong",
       "unicode": "e6f4",
-      "unicode_decimal": 59124
+      "unicode_decimal": 59124,
+      "markdown":"> ",
+      "type":"prefix",
+      "addContent":"> "
     },
     {
       "icon_id": "11372711",
-      "name": "图片",
+      "name": "Image",
       "font_class": "tupian",
       "unicode": "e8ba",
-      "unicode_decimal": 59578
+      "unicode_decimal": 59578,
+      "markdown":"![alt text](image_url)",
+      "type":"none"
     },
     {
       "icon_id": "11975914",
-      "name": "有序列表",
+      "name": "Ordered_list",
       "font_class": "youxuliebiao",
       "unicode": "e611",
-      "unicode_decimal": 58897
+      "unicode_decimal": 58897,
+      "markdown":"1. ",
+      "type":"prefix",
+      "addContent":"1. "
     },
     {
       "icon_id": "40483926",
-      "name": "水平线",
+      "name": "Line",
       "font_class": "shuipingxian",
       "unicode": "e63d",
-      "unicode_decimal": 58941
+      "unicode_decimal": 58941,
+      "markdown":"---",
+      "type":"none"
     },
     {
       "icon_id": "1304951",
-      "name": "列表",
+      "name": "Unordered_list",
       "font_class": "liebiao",
       "unicode": "e62d",
-      "unicode_decimal": 58925
+      "unicode_decimal": 58925,
+      "markdown":"- ",
+      "type":"prefix",
+      "addContent":"- "
     },
     {
       "icon_id": "3851370",
-      "name": "删除线",
+      "name": "Strikethrough",
       "font_class": "shanchuxian",
       "unicode": "e664",
-      "unicode_decimal": 58980
+      "unicode_decimal": 58980,
+      "markdown":"~~strikethrough~~",
+      "type":"sandwich",
+      "addContent":"~~"
     },
     {
       "icon_id": "6337466",
-      "name": "字体加粗",
+      "name": "Bold",
       "font_class": "zitijiacu",
       "unicode": "ec83",
-      "unicode_decimal": 60547
+      "unicode_decimal": 60547,
+      "markdown":"**bold**",
+      "type":"sandwich",
+      "addContent":"**"
     },
     {
       "icon_id": "6337471",
-      "name": "字体斜体",
+      "name": "Italic",
       "font_class": "zitixieti",
       "unicode": "ec85",
-      "unicode_decimal": 60549
+      "unicode_decimal": 60549,
+      "markdown":"*italic*",
+      "type":"sandwich",
+      "addContent":"*"
     },
     {
       "icon_id": "9437945",
-      "name": "H",
+      "name": "Heading",
       "font_class": "H",
       "unicode": "e609",
       "unicode_decimal": 58889
