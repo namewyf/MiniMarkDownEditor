@@ -6,6 +6,7 @@
 // content: 用于存储节点内容。
 // markup: 用于存储 Markdown 标记。
 // block: 用于标识是否是块级元素。
+// markdownParser.js
 interface Token {
   type: string
   content?: string
@@ -76,25 +77,24 @@ function markdownTokenizer(str: string) {
       tokens.push({ type: 'blockquote_close', tag: 'blockquote', nesting: -1 })
       return startState
     } else {
-        // 处理块级元素的嵌套
-        if (char === '>') {
-          tokens.push({ type: 'blockquote_open', tag: 'blockquote', nesting: 1 })
-          return blockquoteState 
-        }
+      if (char === '>') {
+        tokens.push({ type: 'blockquote_open', tag: 'blockquote', nesting: 1 })
+        return blockquoteState 
+      }
       tokens.push({ type: 'text', content: char })
       return blockquoteState
     }
-    }
+  }
 
-    function codeblockState(char: string) {
-      if (char === '`') {
-        tokens.push({ type: 'codeblock_close', tag: 'code', nesting: -1 })
-        return startState 
-      } else {
-        tokens.push({ type: 'text', content: char })
-        return codeblockState
-      }
+  function codeblockState(char: string) {
+    if (char === '`') {
+      tokens.push({ type: 'codeblock_close', tag: 'code', nesting: -1 })
+      return startState 
+    } else {
+      tokens.push({ type: 'text', content: char })
+      return codeblockState
     }
+  }
 
   function boldOrItalicState(char: string) {
     if (char === '*') {
@@ -167,12 +167,12 @@ function markdownTokenizer(str: string) {
   return tokens
 }
 
-export default function renderHTML(tokens: Token[]) {
+function renderHTML(tokens:any[]) {
   let html = ''
   let linkText = ''
   let linkHref = ''
 
-  function renderToken(token: Token) {
+  function renderToken(token:any) {
     switch (token.type) {
       case 'heading_open':
         return `<${token.tag}>`
