@@ -18,13 +18,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 import IconListInfo from '@/assets/iconfont/iconfont.json'
 const textarea = ref(``)
 const htmlContent = ref(``)
-
+onMounted(() => {
+  const savedData = window.localStorage.getItem('textarea');
+  if (savedData) {
+    textarea.value = savedData;
+  }
+});
+watch(textarea, (newVal) => {
+  window.localStorage.setItem('textarea', newVal);
+});
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
