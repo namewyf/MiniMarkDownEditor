@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch } from 'vue'
+import { ref, watch ,useTemplateRef} from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 import IconListInfo from '@/assets/iconfont/iconfont.json'
 const textarea = ref(``)
 const htmlContent = ref(``)
-
+const inputref=useTemplateRef("input")
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
