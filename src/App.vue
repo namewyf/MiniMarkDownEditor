@@ -4,10 +4,21 @@
     <div class="top">
       <button class="iconfont" v-html="'&#x' + item.unicode + ';'" v-for="item in iconList"
         :key="item.icon_id"></button>
+
+    <button class="toolbar-btn" @click="insertOrderedList">
+      <el-icon><List /></el-icon> <!-- 这是有序列表图标,查了半天不知道图标是什么，先这样代替一下 -->
+    </button>
+    <button class="toolbar-btn" @click="insertUnorderedList">
+      <el-icon><Menu /></el-icon> <!-- 这是无序列表图标，同有序列表一样，我只能用自己熟悉的了 -->
+    </button>
+    <button class="toolbar-btn" @click="insertTable"><!-- 这是表格图标 -->
+      <el-icon><Grid /></el-icon>
+    </button>
+
     </div>
     <div class="content">
       <div class="left">
-        <el-input v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input" @keydown="handleKeyDown">
+        <el-input v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input">
         </el-input>
       </div>
       <div class="right">
@@ -18,27 +29,48 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch,onMounted } from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
-import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
+import { Link, Delete, Edit, Search, Share, Upload, List, Menu, Grid } from '@element-plus/icons-vue'
 import IconListInfo from '@/assets/iconfont/iconfont.json'
 
 const textarea = ref(``)
 const htmlContent = ref(``)
+
 onMounted(() => {
   const savedData = window.localStorage.getItem('textarea');
   if (savedData) {
     textarea.value = savedData;
   }
 });
+
 watch(textarea, (newVal) => {
   window.localStorage.setItem('textarea', newVal);
 });
+
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
 })
+//快捷键栏
+const iconList = IconListInfo.glyphs
 
+const insertOrderedList = () => {
+  textarea.value += '\n1.    \n2.    \n3.    '
+}
+
+const insertUnorderedList = () => {
+  textarea.value += '\n- \n  \n- \n  \n- \n  '
+}
+
+const insertTable = () => {
+  const tableTemplate = `
+| 表头1 | 表头2 |
+|-------|-------|
+| 内容1 | 内容2 |
+| 内容3 | 内容4 |`
+  textarea.value += tableTemplate
+}
 // 处理键盘按下事件
 const handleKeyDown = (event:any) => {
   const start = event.target.selectionStart;
@@ -90,8 +122,6 @@ const replaceText = (newText:any, start:any, end:any ,event:any) => {
 };
 
 
-//快捷键栏
-const iconList = IconListInfo.glyphs
 </script>
 
 <style>
@@ -150,5 +180,26 @@ const iconList = IconListInfo.glyphs
       border-radius: 0px;
     }
   }
+}
+
+.toolbar-btn {
+  padding: 8px;
+  margin: 0 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toolbar-btn:hover {
+  background-color: #f0f0f0;
+  border-radius: 4px;
+}
+
+.toolbar-btn.iconfont {
+  font-size: 20px;
+  color: #333;
 }
 </style>
