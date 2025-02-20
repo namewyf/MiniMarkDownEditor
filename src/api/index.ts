@@ -40,6 +40,14 @@ function markdownTokenizer(str: string) {
     } else if (char === '`') {
       tokens.push({ type: 'codeblock_open', tag: 'code', nesting: 1 })
       return codeblockState
+    } else if (char === '-' || char === '+') {//ul ol
+      tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1 })
+      tokens.push({ type: 'bullet_list_open', tag: 'ul', nesting: 1 })
+      return listItemState
+    } else if (/[0-9]/.test(char)) {
+      tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1 })
+      tokens.push({ type: 'ordered_list_open', tag: 'ol', nesting: 1 })
+      return orderedListState
     } else {
       tokens.push({ type: 'text', content: char })
       return textState
@@ -79,7 +87,7 @@ function markdownTokenizer(str: string) {
     } else {
       if (char === '>') {
         tokens.push({ type: 'blockquote_open', tag: 'blockquote', nesting: 1 })
-        return blockquoteState 
+        return blockquoteState
       }
       tokens.push({ type: 'text', content: char })
       return blockquoteState
@@ -89,7 +97,7 @@ function markdownTokenizer(str: string) {
   function codeblockState(char: string) {
     if (char === '`') {
       tokens.push({ type: 'codeblock_close', tag: 'code', nesting: -1 })
-      return startState 
+      return startState
     } else {
       tokens.push({ type: 'text', content: char })
       return codeblockState
@@ -164,6 +172,39 @@ function markdownTokenizer(str: string) {
     }
   }
 
+  function listItemState(char: string) {// ul ol
+    if (char === ' ') {
+      return listContentState
+    } else {
+      tokens.push({ type: 'text', content: char })
+      return textState
+    }
+  }
+
+  function orderedListState(char: string) {
+    if (char === '.') {
+      return function(nextChar: string) {
+        if (nextChar === ' ') {
+          return listContentState
+        }
+        return textState
+      }
+    }
+    tokens.push({ type: 'text', content: char })
+    return textState
+  }
+
+  function listContentState(char: string) {
+    if (char === '\n') {
+      tokens.push({ type: 'list_item_close', tag: 'li', nesting: -1 })
+      tokens.push({ type: 'list_close', tag: 'ul', nesting: -1 })
+      return startState
+    } else {
+      tokens.push({ type: 'text', content: char })
+      return listContentState
+    }
+  }
+
   return tokens
 }
 
@@ -171,7 +212,7 @@ function renderHTML(tokens:any[]) {
   let html = ''
   let linkText = ''
   let linkHref = ''
-
+//ol ul
   function renderToken(token:any) {
     switch (token.type) {
       case 'heading_open':
@@ -210,6 +251,16 @@ function renderHTML(tokens:any[]) {
         return `</${token.tag}>`
       case 'text':
         return token.content
+      case 'bullet_list_open'://ul ol
+        return `<${token.tag}>`
+      case 'ordered_list_open':
+        return `<${token.tag}>`
+      case 'list_close':
+        return `</${token.tag}>`
+      case 'list_item_open':
+        return `<${token.tag}>`
+      case 'list_item_close':
+        return `</${token.tag}>`
       default:
         return ''
     }
