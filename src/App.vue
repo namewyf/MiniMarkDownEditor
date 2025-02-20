@@ -31,14 +31,17 @@ import { ref, watch ,useTemplateRef} from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 import IconListInfo from '@/assets/iconfont/iconfont.json'
+import toHTML from './utils/toHTML'
+import toPDF from './utils/toPDF'
 const textarea = ref(``)
 const htmlContent = ref(``)
-const inputref=useTemplateRef("input")
+const inputref = useTemplateRef("input")
+const showArea=useTemplateRef("showArea")
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
 })
-
+const heading_num=[1,2,3,4,5]
 // 处理键盘按下事件
 const handleKeyDown = (event:any) => {
   const start = event.target.selectionStart;
