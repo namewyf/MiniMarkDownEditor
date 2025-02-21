@@ -131,7 +131,7 @@ function insertAtCursor(item: any, event:any) {
     }
   }
 }
-function insertAtCursor_heading(num:number,event) {
+function insertAtCursor_heading(num:number,event:any) {
   event.preventDefault()
   const length = ref(textarea.value.length)
   if (inputref.value.selectionStart == inputref.value.selectionEnd) {
@@ -238,7 +238,7 @@ function changeTheme() {
       margin: 5px 0;
       border-radius: 0px;
     }
-  
+
   .HeadSelect{
     display: none;
     flex-direction: column;
