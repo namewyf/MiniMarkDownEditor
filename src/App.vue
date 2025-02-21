@@ -16,7 +16,7 @@
     </div>
     <div class="content">
       <div class="left">
-        <textarea v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input" ref="input" id="input">
+        <textarea v-model="textarea" style="width: 100%" :rows="26" type="textarea" placeholder="Please input" ref="input" id="input" @keydown="handleKeyDown">
         </textarea>
       </div>
       <div class="right">
@@ -27,7 +27,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, watch ,useTemplateRef} from 'vue'
+import { ref, watch ,useTemplateRef,onMounted, type ShallowRef} from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
 import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue'
 import IconListInfo from '@/assets/iconfont/iconfont.json'
@@ -35,7 +35,7 @@ import toHTML from './utils/toHTML'
 import toPDF from './utils/toPDF'
 const textarea = ref(``)
 const htmlContent = ref(``)
-const inputref = useTemplateRef("input")
+const inputref:ShallowRef = useTemplateRef("input")
 const showArea=useTemplateRef("showArea")
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
@@ -91,12 +91,20 @@ const replaceText = (newText:any, start:any, end:any ,event:any) => {
   const tokens = markdownTokenizer(textarea.value);
   htmlContent.value = renderHTML(tokens);
 };
-
+onMounted(() => {
+  const savedData = window.localStorage.getItem('textarea');
+  if (savedData) {
+    textarea.value = savedData;
+  }
+});
+watch(textarea, (newVal) => {
+  window.localStorage.setItem('textarea', newVal);
+});
 
 //快捷键栏
 const iconList = IconListInfo.glyphs
 
-function insertAtCursor(item: any, event) {
+function insertAtCursor(item: any, event:any) {
   event.preventDefault()
   if (item.name == "Heading") return;
   const length = ref(textarea.value.length)
@@ -191,7 +199,7 @@ function changeTheme() {
     flex-direction: row;
     justify-content: left;
     flex-wrap: nowrap;background-color: var(--bgColor);
-  color: var(--textColor);
+    color: var(--textColor);
   border-color: var(--borderColoir);
   border-style: solid;
   }
@@ -202,14 +210,14 @@ function changeTheme() {
     align-items: center;
     width: 1200px;
     height: 700px;
-
+  }
     .left {
       width: 50%;
       height: 100%;
       background-color: var(--bgColor);
-  color: var(--textColor);
-  border-color: var(--borderColoir);
-  border-style: solid;
+      color: var(--textColor);
+      border-color: var(--borderColoir);
+      border-style: solid;
     }
 
     .right {
@@ -217,10 +225,11 @@ function changeTheme() {
       width: 600px;
       height: 560px;
       overflow: scroll;
-      background-color: black;background-color: var(--bgColor);
-  color: var(--textColor);
-  border-color: var(--borderColoir);
-  border-style: solid;
+      background-color: black;
+      background-color: var(--bgColor);
+      color: var(--textColor);
+      border-color: var(--borderColoir);
+      border-style: solid;
     }
 
     blockquote {
@@ -229,7 +238,7 @@ function changeTheme() {
       margin: 5px 0;
       border-radius: 0px;
     }
-  }
+  
   .HeadSelect{
     display: none;
     flex-direction: column;
