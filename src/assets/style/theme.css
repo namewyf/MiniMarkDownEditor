@@ -1,0 +1,11 @@
+:root[theme='light']{
+    --bgColor:#fff;
+    --textColor:#000;
+    --borderColor:#000;
+} 
+ 
+:root[theme='dark']{
+    --bgColor:#000;
+    --textColor:#fff;
+    --borderColor:#fff;
+}
