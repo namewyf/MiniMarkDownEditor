@@ -1,7 +1,7 @@
 import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 
-export default function toPDF  (dom) {
+export default function toPDF  (dom:any) {
       html2Canvas(dom, {
         // allowTaint: true
         useCORS:true//看情况选用上面还是下面的，
