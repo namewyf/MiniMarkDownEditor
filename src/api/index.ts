@@ -40,6 +40,8 @@ function markdownTokenizer(str: string) {
     } else if (char === '`') {
       tokens.push({ type: 'codeblock_open', tag: 'code', nesting: 1 })
       return codeblockState
+    } else if (char === '!') {
+      return imageAltTextState
     } else {
       tokens.push({ type: 'text', content: char })
       return textState
@@ -79,7 +81,7 @@ function markdownTokenizer(str: string) {
     } else {
       if (char === '>') {
         tokens.push({ type: 'blockquote_open', tag: 'blockquote', nesting: 1 })
-        return blockquoteState 
+        return blockquoteState
       }
       tokens.push({ type: 'text', content: char })
       return blockquoteState
@@ -89,7 +91,7 @@ function markdownTokenizer(str: string) {
   function codeblockState(char: string) {
     if (char === '`') {
       tokens.push({ type: 'codeblock_close', tag: 'code', nesting: -1 })
-      return startState 
+      return startState
     } else {
       tokens.push({ type: 'text', content: char })
       return codeblockState
@@ -155,6 +157,43 @@ function markdownTokenizer(str: string) {
     }
   }
 
+  function imageAltTextState(char: string) {
+    if (char === '[') {
+      return imageAltTextContentState
+    } else {
+      tokens.push({ type: 'text', content: '!' + char })
+      return textState
+    }
+  }
+
+  function imageAltTextContentState(char: string) {
+    if (char === ']') {
+      tokens.push({ type: 'image_alt_text_close' })
+      return imageSrcState
+    } else {
+      tokens.push({ type: 'image_alt_text', content: char })
+      return imageAltTextContentState
+    }
+  }
+
+  function imageSrcState(char: string) {
+    if (char === '(') {
+      return imageSrcContentState
+    } else {
+      return startState(char)
+    }
+  }
+
+  function imageSrcContentState(char: string) {
+    if (char === ')') {
+      tokens.push({ type: 'image_close', tag: 'img', nesting: -1 })
+      return startState
+    } else {
+      tokens.push({ type: 'image_src', content: char })
+      return imageSrcContentState
+    }
+  }
+
   function textState(char: string) {
     if (char === '\n') {
       return startState
@@ -167,12 +206,14 @@ function markdownTokenizer(str: string) {
   return tokens
 }
 
-function renderHTML(tokens:any[]) {
+function renderHTML(tokens: any[]) {
   let html = ''
   let linkText = ''
   let linkHref = ''
+  let imageAltText = ''
+  let imageSrc = ''
 
-  function renderToken(token:any) {
+  function renderToken(token: any) {
     switch (token.type) {
       case 'heading_open':
         return `<${token.tag}>`
@@ -208,6 +249,16 @@ function renderHTML(tokens:any[]) {
         return `<${token.tag}>`
       case 'codeblock_close':
         return `</${token.tag}>`
+      case 'image_alt_text':
+        imageAltText += token.content
+        return ''
+      case 'image_alt_text_close':
+        return ''
+      case 'image_src':
+        imageSrc += token.content
+        return ''
+      case 'image_close':
+        return `<img src="${imageSrc}" alt="${imageAltText}">`
       case 'text':
         return token.content
       default:
