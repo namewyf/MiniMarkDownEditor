@@ -1,7 +1,7 @@
 import html2Canvas from 'html2canvas'
 import JsPDF from 'jspdf'
 
-export default function toPDF  (dom) {
+export default function toPDF  (dom:any) {
       html2Canvas(dom, {
         // allowTaint: true
         useCORS:true//看情况选用上面还是下面的，
@@ -14,7 +14,7 @@ export default function toPDF  (dom) {
             let imgWidth = 595.28
             let imgHeight = 592.28 / contentWidth * contentHeight
             let pageData = canvas.toDataURL('image/jpeg', 1.0)
-            let PDF = new JsPDF('', 'pt', 'a4')
+            let PDF = new JsPDF('p', 'pt', 'a4')
             if (leftHeight < pageHeight) {
                 PDF.addImage(pageData, 'JPEG', 0, 0, imgWidth, imgHeight)
             } else {
