@@ -270,4 +270,21 @@ function changeTheme() {
     background-color: var(--bgColor);
     color: var(--textColor);
   }
+  table {
+width: 200px;
+border-top: 2px solid #999;
+border-left: 2px solid #999;
+border-spacing: 0;
+}
+
+table td {
+padding: 10px 30px;
+border-bottom: 2px solid #999;
+border-right: 2px solid #999;
+}
+table th {
+padding: 10px 30px;
+border-bottom: 2px solid #999;
+border-right: 2px solid #999;
+}
 </style>

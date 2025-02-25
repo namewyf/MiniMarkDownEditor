@@ -40,12 +40,77 @@ function markdownTokenizer(str: string) {
     } else if (char === '`') {
       tokens.push({ type: 'codeblock_open', tag: 'code', nesting: 1 })
       return codeblockState
+    } else if (char === '|') {
+      tokens.push({ type: "table_start", tag: 'table' })
+      tokens.push({type:'theadb',tag:"thead"})
+      tokens.push({ type: 'table_line_start', tag: 'tr' })
+      tokens.push({type:'thead_start',tag:'th'})
+      return tableHeadState
     } else {
       tokens.push({ type: 'text', content: char })
       return textState
     }
   }
 
+  function tableHeadState(char:string) {
+    if (char === '|') {
+      tokens.push({ type: "thead_end", tag: 'th' })
+      tokens.push({ type: 'thead_start', tag: "th" })
+      return tableHeadState
+    } else if (char === '\n') {
+      tokens.pop()
+      tokens.push({ type: "table_line_end", tag: 'tr' })
+      tokens.push({type:'theade',tag:'thead'})
+      return tableDivide
+    } else {
+      tokens.push({ type: 'text', content: char })
+      return tableHeadState
+    }
+  }
+  function tableDivide(char:string) {
+    if (char === '\n') {
+      tokens.push({type:"tbodyb",tag:'tbody'})
+      tokens.push({type:"table_line_start",tag:"tr"})
+      return function (char: string) {
+        if (char === '|') {
+          tokens.push({ type: 'tbody_start', tag: 'td' })
+          return tableBodyState
+        }
+        else return tableDivide
+      }
+    }
+    return tableDivide
+  }
+
+  function tableBodyState(char:string) {
+    if (char === '|') {
+      tokens.push({ type: 'tbody_end', tag: 'td' })
+      tokens.push({ type: 'tbody_start', tag: 'td' })
+      return tableBodyState
+    } else if(char==='\n'){
+      tokens.pop()
+      tokens.push({ type: "table_line_end", tag: 'tr' })
+      return function (char:string) {
+        if (char === '|') {
+          tokens.push({ type: 'tbody_end', tag: 'td' })
+          tokens.push({ type: 'tbody_start', tag: 'td' })
+          return tableBodyState
+        } else if(char==='\n'){
+          tokens.pop()
+          tokens.push({ type: "table_line_end", tag: 'tr' })
+            tokens.push({type:"tbodye",tag:'tbody'})
+            tokens.push({ type: "table_end", tag: 'table' })
+            return startState
+        } else {
+          tokens.push({ type: "text", content: char })
+          return tableBodyState
+        }
+      }
+    } else {
+      tokens.push({ type: "text", content: char })
+      return tableBodyState
+    }
+  }
   function headingState(level: number) {
     return function (char: string) {
       if (char === '#') {
@@ -79,7 +144,7 @@ function markdownTokenizer(str: string) {
     } else {
       if (char === '>') {
         tokens.push({ type: 'blockquote_open', tag: 'blockquote', nesting: 1 })
-        return blockquoteState 
+        return blockquoteState
       }
       tokens.push({ type: 'text', content: char })
       return blockquoteState
@@ -89,7 +154,7 @@ function markdownTokenizer(str: string) {
   function codeblockState(char: string) {
     if (char === '`') {
       tokens.push({ type: 'codeblock_close', tag: 'code', nesting: -1 })
-      return startState 
+      return startState
     } else {
       tokens.push({ type: 'text', content: char })
       return codeblockState
@@ -208,6 +273,30 @@ function renderHTML(tokens:any[]) {
         return `<${token.tag}>`
       case 'codeblock_close':
         return `</${token.tag}>`
+      case `table_start`:
+        return `<${token.tag}>`
+      case `table_line_start`:
+        return `<${token.tag}>`
+      case `thead_start`:
+        return `<${token.tag}>`
+      case `tbody_start`:
+        return `<${token.tag}>`
+      case `table_end`:
+          return `</${token.tag}>`
+      case `table_line_end`:
+          return `</${token.tag}>`
+      case `thead_end`:
+          return `</${token.tag}>`
+      case `tbody_end`:
+        return `</${token.tag}>`
+      case 'theadb':
+          return `<${token.tag}>`
+      case 'theade':
+        return `</${token.tag}>`
+      case 'tbodyb':
+          return `<${token.tag}>`
+      case 'tbodye':
+          return `</${token.tag}>`
       case 'text':
         return token.content
       default:
