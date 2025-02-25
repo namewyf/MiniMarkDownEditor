@@ -1,4 +1,4 @@
-export default function toHTML(target) {
+export default function toHTML(target:any) {
   const temp = [
     '<!doctype html>',
     '<html>',
