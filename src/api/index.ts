@@ -116,7 +116,7 @@ function markdownTokenizer(str: string) {
 
   function boldContentState(char: string) {
     if (char === '*' && tokens[tokens.length - 1].content === '*') {
-      tokens.pop() // Remove the last text token which is '*'
+      tokens.pop()
       tokens.push({ type: 'bold_close', tag: 'strong', nesting: -1 })
       return startState
     } else {
@@ -165,6 +165,7 @@ function markdownTokenizer(str: string) {
 
   function textState(char: string) {
     if (char === '\n') {
+      tokens.push({ type: 'text', content: '\n' })
       return startState
     } else {
       tokens.push({ type: 'text', content: char })
@@ -208,12 +209,12 @@ function markdownTokenizer(str: string) {
   return tokens
 }
 
-function renderHTML(tokens:any[]) {
+function renderHTML(tokens: any[]) {
   let html = ''
   let linkText = ''
   let linkHref = ''
-//ol ul
-  function renderToken(token:any) {
+
+  function renderToken(token: any) {
     switch (token.type) {
       case 'heading_open':
         return `<${token.tag}>`
@@ -250,6 +251,9 @@ function renderHTML(tokens:any[]) {
       case 'codeblock_close':
         return `</${token.tag}>`
       case 'text':
+        if (token.content === '\n') {
+          return '<br>'
+        }
         return token.content
       case 'bullet_list_open'://ul ol
         return `<${token.tag}>`

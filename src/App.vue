@@ -26,7 +26,6 @@
   </div>
 </template>
 
-
 <script lang="ts" setup>
 import { ref, watch ,useTemplateRef,onMounted, type ShallowRef} from 'vue'
 import { markdownTokenizer, renderHTML } from './api/index'
@@ -121,10 +120,6 @@ function insertAtCursor(item: any, event:any) {
       textarea.value.substring(inputref.value.selectionEnd, length.value);
     }
     else if (item.type == "prefix") {
-      //若选中文本已经采用了markdown语法则进行还原
-      /* if (textarea.value.substring(inputref.value.selectionStart, inputref.value.selectionEnd).startsWith(item.addContent)) {
-        inputref.value.setRangeText(textarea.value.substring(inputref.value.selectionStart + item.addContent.length, inputref.value.selectionEnd))
-      } */
       inputref.value.setRangeText(item.addContent + textarea.value.substring(inputref.value.selectionStart, inputref.value.selectionEnd))
     }
     else if (item.type == "sandwich") {
@@ -222,15 +217,23 @@ function changeTheme() {
     }
 
     .right {
-      white-space: pre-line;
+      white-space: pre-wrap;
       width: 600px;
       height: 560px;
       overflow: scroll;
-      background-color: black;
       background-color: var(--bgColor);
       color: var(--textColor);
       border-color: var(--borderColoir);
       border-style: solid;
+      padding: 10px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+
+    .right br {
+      display: block;
+      margin: 2px 0;
+      content: "";
     }
 
     blockquote {
