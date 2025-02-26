@@ -101,16 +101,47 @@ watch(textarea, (newVal) => {
   window.localStorage.setItem('textarea', newVal);
 });
 
-//快捷键栏
+
 const iconList = IconListInfo.glyphs
+
+let olCounter = 1;
+let isInOrderedList = false;
 
 function insertAtCursor(item: any, event:any) {
   event.preventDefault()
   if (item.name == "Heading") return;
   const length = ref(textarea.value.length)
+
   if (inputref.value.selectionStart == inputref.value.selectionEnd) {
+    let insertContent = item.markdown;
+
+    if (item.name === "OrderedList") {
+      const textBeforeCursor = textarea.value.substring(0, inputref.value.selectionStart);
+      const lines = textBeforeCursor.split('\n');
+      const currentLineIndex = lines.length - 1;
+
+      const prevLine = currentLineIndex > 0 ? lines[currentLineIndex - 1] : '';
+      const isPrevLineOrderedList = /^\d+\./.test(prevLine);
+
+      if (!isPrevLineOrderedList) {
+        olCounter = 1;
+        isInOrderedList = true;
+      }
+
+      insertContent = `${olCounter}. `;
+      olCounter++;
+
+      const currentLine = lines[currentLineIndex] || '';
+      if (currentLine.length > 0) {
+        insertContent = '\n' + insertContent;
+      }
+    } else {
+      isInOrderedList = false;
+      olCounter = 1;
+    }
+
     textarea.value = textarea.value.substring(0, inputref.value.selectionStart) +
-      item.markdown +
+      insertContent +
       textarea.value.substring(inputref.value.selectionStart, length.value);
   }
   else {
@@ -127,6 +158,20 @@ function insertAtCursor(item: any, event:any) {
     }
   }
 }
+
+function handleInput(event: any) {
+  if (event.inputType === 'insertLineBreak') {
+    const textBeforeCursor = textarea.value.substring(0, inputref.value.selectionStart);
+    const lines = textBeforeCursor.split('\n');
+    const lastLine = lines[lines.length - 2] || '';
+
+    if (!lastLine.match(/^\d+\./)) {
+      isInOrderedList = false;
+      olCounter = 1;
+    }
+  }
+}
+
 function insertAtCursor_heading(num:number,event:any) {
   event.preventDefault()
   const length = ref(textarea.value.length)
@@ -273,5 +318,14 @@ function changeTheme() {
     height: 100%;
     background-color: var(--bgColor);
     color: var(--textColor);
+  }
+
+  .right ul, .right ol {
+    margin: 10px 0;
+    padding-left: 20px;
+  }
+
+  .right li {
+    margin: 5px 0;
   }
 </style>

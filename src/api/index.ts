@@ -16,11 +16,14 @@ interface Token {
   children?: Token[] // 递归定义子 token
   markup?: string
   block?: boolean
+  value?: number
 }
 
 function markdownTokenizer(str: string) {
   const tokens: Token[] = []
   let state = startState
+  let listCounter = 1
+  let isInOrderedList = false  
 
   for (const char of str) {
     state = state(char)
@@ -40,13 +43,20 @@ function markdownTokenizer(str: string) {
     } else if (char === '`') {
       tokens.push({ type: 'codeblock_open', tag: 'code', nesting: 1 })
       return codeblockState
-    } else if (char === '-' || char === '+') {//ul ol
+    } else if (char === '-' || char === '+') {
+      if (!tokens.some(t => t.type === 'bullet_list_open')) {
+        tokens.push({ type: 'bullet_list_open', tag: 'ul', nesting: 1 })
+      }
       tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1 })
-      tokens.push({ type: 'bullet_list_open', tag: 'ul', nesting: 1 })
+      isInOrderedList = false  // 重置有序列表状态
       return listItemState
     } else if (/[0-9]/.test(char)) {
-      tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1 })
-      tokens.push({ type: 'ordered_list_open', tag: 'ol', nesting: 1 })
+      if (!isInOrderedList) {
+        tokens.push({ type: 'ordered_list_open', tag: 'ol', nesting: 1 })
+        listCounter = 1
+        isInOrderedList = true
+      }
+      tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1, value: listCounter++ })
       return orderedListState
     } else {
       tokens.push({ type: 'text', content: char })
@@ -173,7 +183,7 @@ function markdownTokenizer(str: string) {
     }
   }
 
-  function listItemState(char: string) {// ul ol
+  function listItemState(char: string) {
     if (char === ' ') {
       return listContentState
     } else {
@@ -188,6 +198,7 @@ function markdownTokenizer(str: string) {
         if (nextChar === ' ') {
           return listContentState
         }
+        tokens.push({ type: 'text', content: char + nextChar })
         return textState
       }
     }
@@ -198,7 +209,16 @@ function markdownTokenizer(str: string) {
   function listContentState(char: string) {
     if (char === '\n') {
       tokens.push({ type: 'list_item_close', tag: 'li', nesting: -1 })
-      tokens.push({ type: 'list_close', tag: 'ul', nesting: -1 })
+      const nextChar = str[tokens.length + 1]
+      if (nextChar !== '-' && nextChar !== '+' && !/[0-9]/.test(nextChar)) {
+        if (tokens.some(t => t.type === 'bullet_list_open')) {
+          tokens.push({ type: 'bullet_list_close', tag: 'ul', nesting: -1 })
+        } else if (tokens.some(t => t.type === 'ordered_list_open')) {
+          tokens.push({ type: 'ordered_list_close', tag: 'ol', nesting: -1 })
+          isInOrderedList = false  // 重置有序列表状态
+          listCounter = 1
+        }
+      }
       return startState
     } else {
       tokens.push({ type: 'text', content: char })
@@ -255,13 +275,18 @@ function renderHTML(tokens: any[]) {
           return '<br>'
         }
         return token.content
-      case 'bullet_list_open'://ul ol
+      case 'bullet_list_open':
         return `<${token.tag}>`
+      case 'bullet_list_close':
+        return `</${token.tag}>`
       case 'ordered_list_open':
         return `<${token.tag}>`
-      case 'list_close':
+      case 'ordered_list_close':
         return `</${token.tag}>`
       case 'list_item_open':
+        if (token.value) { // ol
+          return `<${token.tag} value="${token.value}">`
+        }
         return `<${token.tag}>`
       case 'list_item_close':
         return `</${token.tag}>`

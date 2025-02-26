@@ -44,13 +44,12 @@
     },
     {
       "icon_id": "11975914",
-      "name": "Ordered_list",
+      "name": "OrderedList",
       "font_class": "youxuliebiao",
       "unicode": "e611",
       "unicode_decimal": 58897,
-      "markdown":"1. ",
-      "type":"prefix",
-      "addContent":"1. "
+      "markdown": "1. ",
+      "type": "none"
     },
     {
       "icon_id": "40483926",
