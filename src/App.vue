@@ -36,10 +36,13 @@ import toPDF from './utils/toPDF'
 const textarea = ref(``)
 const htmlContent = ref(``)
 const inputref:ShallowRef = useTemplateRef("input")
-const showArea=useTemplateRef("showArea")
+const showArea = useTemplateRef("showArea")
+
+
 watch(textarea, (newValue) => {
   const tokenList = markdownTokenizer(newValue)
   htmlContent.value = renderHTML(tokenList)
+  window.localStorage.setItem('textarea', newValue);
 })
 const heading_num=[1,2,3,4,5]
 // 处理键盘按下事件
@@ -91,14 +94,12 @@ const replaceText = (newText:any, start:any, end:any ,event:any) => {
   const tokens = markdownTokenizer(textarea.value);
   htmlContent.value = renderHTML(tokens);
 };
+
 onMounted(() => {
   const savedData = window.localStorage.getItem('textarea');
   if (savedData) {
     textarea.value = savedData;
   }
-});
-watch(textarea, (newVal) => {
-  window.localStorage.setItem('textarea', newVal);
 });
 
 //快捷键栏
@@ -108,16 +109,17 @@ function insertAtCursor(item: any, event:any) {
   event.preventDefault()
   if (item.name == "Heading") return;
   const length = ref(textarea.value.length)
+  //工具栏的核心渲染逻辑
   if (inputref.value.selectionStart == inputref.value.selectionEnd) {
     textarea.value = textarea.value.substring(0, inputref.value.selectionStart) +
       item.markdown +
       textarea.value.substring(inputref.value.selectionStart, length.value);
   }
+  //其它功能渲染逻辑
   else {
     if (item.type == "none") {
-      textarea.value = textarea.value.substring(0, inputref.value.selectionEnd) +
-      item.markdown +
-      textarea.value.substring(inputref.value.selectionEnd, length.value);
+      textarea.value = textarea.value.substring(0, inputref.value.selectionEnd) + item.markdown +textarea.value.substring(inputref.value.selectionEnd, length.value);
+      //处理图片的插入
     }
     else if (item.type == "prefix") {
       //若选中文本已经采用了markdown语法则进行还原
