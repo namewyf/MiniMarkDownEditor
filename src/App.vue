@@ -346,6 +346,7 @@ const loadPluginButtonClick = () => {
   color: var(--textColor);
   border-color: var(--borderColoir);
   border-style: solid;
+   
 }
 
 .content {
