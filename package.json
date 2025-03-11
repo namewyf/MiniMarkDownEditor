@@ -21,6 +21,7 @@
     "element-plus": "^2.9.3",
     "html2canvas": "^1.4.1",
     "jspdf": "^2.5.2",
+    "vite-plugin-vue-inspector": "^5.3.1",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0"
   },

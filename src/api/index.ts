@@ -43,27 +43,8 @@ function markdownTokenizer(str: string) {
     } else if (char === '`') {
       tokens.push({ type: 'codeblock_open', tag: 'code', nesting: 1 })
       return codeblockState
-    } else if (char === '|') {
-      tokens.push({ type: "table_start", tag: 'table' })
-      tokens.push({type:'theadb',tag:"thead"})
-      tokens.push({ type: 'table_line_start', tag: 'tr' })
-      tokens.push({type:'thead_start',tag:'th'})
-      return tableHeadState
-    } else if (char === '-' || char === '+') {
-      if (!tokens.some(t => t.type === 'bullet_list_open')) {
-        tokens.push({ type: 'bullet_list_open', tag: 'ul', nesting: 1 })
-      }
-      tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1 })
-      isInOrderedList = false  // 重置有序列表状态
-      return listItemState
-    } else if (/[0-9]/.test(char)) {
-      if (!isInOrderedList) {
-        tokens.push({ type: 'ordered_list_open', tag: 'ol', nesting: 1 })
-        listCounter = 1
-        isInOrderedList = true
-      }
-      tokens.push({ type: 'list_item_open', tag: 'li', nesting: 1, value: listCounter++ })
-      return orderedListState
+    } else if (char === '!') {
+      return imageAltTextState
     } else {
       tokens.push({ type: 'text', content: char })
       return textState
@@ -238,6 +219,43 @@ function markdownTokenizer(str: string) {
     }
   }
 
+  function imageAltTextState(char: string) {
+    if (char === '[') {
+      return imageAltTextContentState
+    } else {
+      tokens.push({ type: 'text', content: '!' + char })
+      return textState
+    }
+  }
+
+  function imageAltTextContentState(char: string) {
+    if (char === ']') {
+      tokens.push({ type: 'image_alt_text_close' })
+      return imageSrcState
+    } else {
+      tokens.push({ type: 'image_alt_text', content: char })
+      return imageAltTextContentState
+    }
+  }
+
+  function imageSrcState(char: string) {
+    if (char === '(') {
+      return imageSrcContentState
+    } else {
+      return startState(char)
+    }
+  }
+
+  function imageSrcContentState(char: string) {
+    if (char === ')') {
+      tokens.push({ type: 'image_close', tag: 'img', nesting: -1 })
+      return startState
+    } else {
+      tokens.push({ type: 'image_src', content: char })
+      return imageSrcContentState
+    }
+  }
+
   function textState(char: string) {
     if (char === '\n') {
       tokens.push({ type: 'text', content: '\n' })
@@ -298,6 +316,8 @@ function renderHTML(tokens: any[]) {
   let html = ''
   let linkText = ''
   let linkHref = ''
+  let imageAltText = ''
+  let imageSrc = ''
 
   function renderToken(token: any) {
     switch (token.type) {
@@ -335,30 +355,16 @@ function renderHTML(tokens: any[]) {
         return `<${token.tag}>`
       case 'codeblock_close':
         return `</${token.tag}>`
-      case `table_start`:
-        return `<${token.tag}>`
-      case `table_line_start`:
-        return `<${token.tag}>`
-      case `thead_start`:
-        return `<${token.tag}>`
-      case `tbody_start`:
-        return `<${token.tag}>`
-      case `table_end`:
-          return `</${token.tag}>`
-      case `table_line_end`:
-          return `</${token.tag}>`
-      case `thead_end`:
-          return `</${token.tag}>`
-      case `tbody_end`:
-        return `</${token.tag}>`
-      case 'theadb':
-          return `<${token.tag}>`
-      case 'theade':
-        return `</${token.tag}>`
-      case 'tbodyb':
-          return `<${token.tag}>`
-      case 'tbodye':
-          return `</${token.tag}>`
+      case 'image_alt_text':
+        imageAltText += token.content
+        return ''
+      case 'image_alt_text_close':
+        return ''
+      case 'image_src':
+        imageSrc += token.content
+        return ''
+      case 'image_close':
+        return `<img src="${imageSrc}" alt="${imageAltText}">`
       case 'text':
         if (token.content === '\n') {
           return '<br>'
