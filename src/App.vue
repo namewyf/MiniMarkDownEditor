@@ -32,11 +32,10 @@
 <script lang="ts" setup>
 import { ref, watch, useTemplateRef, onMounted, type ShallowRef } from 'vue';
 import { markdownTokenizer, renderHTML } from './api/index';
-import { Link, Delete, Edit, Search, Share, Upload } from '@element-plus/icons-vue';
 import IconListInfo from '@/assets/iconfont/iconfont.json';
 import toHTML from './utils/toHTML';
 import toPDF from './utils/toPDF';
-import type { EditorPlugin } from '../plugins.ts';
+import { EditorPlugin } from '../plugins';
 
 const textarea = ref('');
 const htmlContent = ref('');
@@ -56,13 +55,13 @@ const registerPlugin = (plugin: EditorPlugin) => {
     textarea,
     htmlContent,
     inputref,
-    showArea
+    showArea:null
   });
 };
 
 // 节流函数
 const throttle = (func: () => void, delay: number) => {
-  let timer: number | null = null;
+  let timer:any = null;
   return () => {
     if (!timer) {
       func();
@@ -78,7 +77,7 @@ const syncRightScroll = () => {
   if (isSyncing.value) return;
   isSyncing.value = true;
   const input = inputref.value as HTMLTextAreaElement;
-  const preview = showArea.value as HTMLElement;
+  const preview:any = showArea.value;
   const scrollRatio = input.scrollTop / (input.scrollHeight - input.clientHeight);
   preview.scrollTop = scrollRatio * (preview.scrollHeight - preview.clientHeight);
   isSyncing.value = false;
@@ -89,7 +88,7 @@ const syncLeftScroll = () => {
   if (isSyncing.value) return;
   isSyncing.value = true;
   const input = inputref.value as HTMLTextAreaElement;
-  const preview = showArea.value as HTMLElement;
+  const preview:any = showArea.value;
   const scrollRatio = preview.scrollTop / (preview.scrollHeight - preview.clientHeight);
   input.scrollTop = scrollRatio * (input.scrollHeight - input.clientHeight);
   isSyncing.value = false;
@@ -100,42 +99,12 @@ const handleLeftScroll = throttle(syncRightScroll, 50);
 const handleRightScroll = throttle(syncLeftScroll, 50);
 
 watch(textarea, (newValue) => {
-  // 找出文本中发生变化的部分
-  const startIndex = findCommonPrefixLength(cachedText.value, newValue);
-  const endIndex = findCommonSuffixLength(cachedText.value, newValue, startIndex);
-
-  const unchangedStart = cachedHTML.value.slice(0, startIndex);
-  const unchangedEnd = cachedHTML.value.slice(endIndex);
-
-  const changedText = newValue.slice(startIndex, newValue.length - (cachedText.value.length - endIndex));
-  const tokenList = markdownTokenizer(changedText);
-  const changedHTML = renderHTML(tokenList);
-
-  htmlContent.value = unchangedStart + changedHTML + unchangedEnd;
+  const tokenList = markdownTokenizer(newValue);
+  htmlContent.value = renderHTML(tokenList);
   cachedText.value = newValue;
   cachedHTML.value = htmlContent.value;
   window.localStorage.setItem('textarea', newValue);
 });
-
-// 查找两个字符串的公共前缀长度
-const findCommonPrefixLength = (str1: string, str2: string) => {
-  let i = 0;
-  while (i < str1.length && i < str2.length && str1[i] === str2[i]) {
-    i++;
-  }
-  return i;
-};
-
-// 查找两个字符串从指定位置开始的公共后缀长度
-const findCommonSuffixLength = (str1: string, str2: string, startIndex: number) => {
-  let i = str1.length - 1;
-  let j = str2.length - 1;
-  while (i >= startIndex && j >= startIndex && str1[i] === str2[j]) {
-    i--;
-    j--;
-  }
-  return i + 1;
-};
 
 const heading_num = [1, 2, 3, 4, 5];
 
@@ -255,6 +224,10 @@ function insertAtCursor(item: any, event: any) {
       inputref.value.setRangeText(item.addContent + textarea.value.substring(inputref.value.selectionStart, inputref.value.selectionEnd) + item.addContent);
     }
   }
+
+  // 重新渲染 HTML
+  const tokens = markdownTokenizer(textarea.value);
+  htmlContent.value = renderHTML(tokens);
 }
 
 function insertAtCursor_heading(num: number, event: any) {
@@ -268,6 +241,10 @@ function insertAtCursor_heading(num: number, event: any) {
   } else {
     inputref.value.setRangeText('#'.repeat(num) + ' ' + textarea.value.substring(inputref.value.selectionStart, inputref.value.selectionEnd));
   }
+
+  // 重新渲染 HTML
+  const tokens = markdownTokenizer(textarea.value);
+  htmlContent.value = renderHTML(tokens);
 }
 
 // 换色
